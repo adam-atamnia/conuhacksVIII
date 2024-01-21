@@ -15,6 +15,34 @@ import DashboardCard09 from '../partials/dashboard/DashboardCard09';
 function Dashboard() {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [selectedDates, setSelectedDates] = useState({ startDate: null, endDate: null });
+
+  const fetchData = async () => {
+    console.log("fetchData called"); // Debugging line
+  
+    if (selectedDates.startDate && selectedDates.endDate) {
+      const formattedStartDate = selectedDates.startDate.toISOString().split('T')[0];
+      const formattedEndDate = selectedDates.endDate.toISOString().split('T')[0];
+      console.log("Formatted dates:", formattedStartDate, formattedEndDate); // Debugging line
+  
+      const url = `/stats/get_data?start_date=${formattedStartDate}&end_date=${formattedEndDate}`;
+  
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log(data); // or set this data to state to use in your component
+      } catch (error) {
+        console.error('Fetch error:', error);
+      }
+    } else {
+      console.log("Start or end date is missing"); // Debugging line
+    }
+  };
+  
+  
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -42,9 +70,13 @@ function Dashboard() {
               {/* Right: Actions */}
               <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
               
-                <Datepicker />
+              <Datepicker 
+  onDateChange={(startDate, endDate) => setSelectedDates({ startDate, endDate })}
+/>
+
+
                 {/* Add view button */}
-                <button className="btn bg-indigo-500 hover:bg-indigo-600 text-white">
+                <button className="btn bg-indigo-500 hover:bg-indigo-600 text-white" onClick={fetchData}>
                     <svg className="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
                         <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
                     </svg>
