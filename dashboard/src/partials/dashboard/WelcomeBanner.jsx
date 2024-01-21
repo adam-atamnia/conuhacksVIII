@@ -1,6 +1,11 @@
 import React from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 
 function WelcomeBanner() {
+  const { user, isAuthenticated, isLoading} = useAuth0();
+  
+
+  
   return (
     <div className="relative bg-indigo-200 dark:bg-indigo-500 p-4 sm:p-6 rounded-sm overflow-hidden mb-8">
       {/* Background illustration */}
@@ -47,7 +52,7 @@ function WelcomeBanner() {
 
       {/* Content */}
       <div className="relative">
-        <h1 className="text-2xl md:text-3xl text-slate-800 dark:text-slate-100 font-bold mb-1">Good afternoon, Acme Inc. 👋</h1>
+        <h1 className="text-2xl md:text-3xl text-slate-800 dark:text-slate-100 font-bold mb-1">Good afternoon, Hisham 👋</h1>
         
       </div>
     </div>

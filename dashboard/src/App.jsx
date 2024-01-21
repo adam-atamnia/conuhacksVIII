@@ -15,6 +15,7 @@ import Dashboard from './pages/Dashboard';
 import { useAuth0 } from '@auth0/auth0-react';
 
 import UploadFile from './pages/Upload';
+import LoginPage from './pages/Login';
 
 function App() {
 
@@ -37,6 +38,7 @@ function App() {
       <Routes>
         <Route exact path="/" element={<Dashboard />} />
         <Route exact path="/upload" element={<UploadFile />} />
+        <Route exact path="/login" element={<LoginPage />} />
         
       </Routes>
     </>
