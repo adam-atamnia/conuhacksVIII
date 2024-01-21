@@ -1,6 +1,5 @@
 import csv
 from datetime import datetime
-import copy
 
 # Specify the path to your CSV file
 csv_file_path = './datafile.csv'
