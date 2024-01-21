@@ -50,9 +50,10 @@ reserved_bays = [
 def add_appointment(appointment):
 
     for i in range(len(bay_list)):
+        if is_outside_working_hours(appointment): return False
         if i < 5 and reserved_bays[i] != appointment['type']:
             continue
-        if is_bay_available(i, appointment):
+        if binary_search_for_conflict(i, appointment):
             bay_list[i]['appointments'].append(appointment)
             return True
     return False
@@ -63,7 +64,43 @@ def is_bay_available(bay_index, appointment):
             return False
     return True
 
+def binary_search_for_conflict(bay_index, appointment):
+    # Sort the list of appointments by appointment_time
+    bay_list[bay_index]['appointments'].sort(key=lambda x: x['appointment_time'])
+    
+    # Binary search for conflicts
+    left, right = 0, len(bay_list[bay_index]['appointments']) - 1
+    while left <= right:
+        mid = (left + right) // 2
+        booked_appointment = bay_list[bay_index]['appointments'][mid]
+        
+        if is_conflict(booked_appointment, appointment):
+            return False  # Conflict found, return False
+        elif booked_appointment['appointment_time'] < appointment['appointment_time']:
+            left = mid + 1
+        else:
+            right = mid - 1
+    
+    return True  # No conflicts found
+
 from datetime import datetime, timedelta
+
+def is_outside_working_hours(appointment):
+    # Define the working hour thresholds (7 AM and 7 PM)
+    start_working_hour = datetime.strptime('07:00:00', '%H:%M:%S').time()
+    end_working_hour = datetime.strptime('19:00:00', '%H:%M:%S').time()
+
+    # Parse the appointment time as a datetime object
+    appointment_time = datetime.strptime(appointment['appointment_time'], '%Y-%m-%d %H:%M')
+
+    # Extract the time part from the datetime
+    appointment_time = appointment_time.time()
+
+    # Check if the appointment starts before 7 AM or finishes after 7 PM
+    if appointment_time < start_working_hour or appointment_time > end_working_hour:
+        return True  # Outside working hours
+    else:
+        return False  # Within working hours
 
 def is_conflict(appointment1, appointment2):
     # Define servicing times for each type
@@ -112,13 +149,6 @@ for i in range(len(appointments)):
 print(appointments)
 
 import csv
-
-# List of dictionaries
-data_list = [
-    {'name': 'John', 'age': 30},
-    {'name': 'Alice', 'age': 25},
-    {'name': 'Bob', 'age': 35}
-]
 
 # Specify the path to the CSV file
 csv_file_path = 'output.csv'
