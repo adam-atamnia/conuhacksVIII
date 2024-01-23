@@ -26,14 +26,16 @@ def read_original_appointments_csv():
             }
             data_list.append(data_dict)
 
-
     # Sort the list by appointment_time
-    appointments = sort_appointments_list(data_list)
+    appointments = sort_appointments_and_convert_time(data_list)
 
     return appointments
 
-def sort_appointments_list(appointments):
-    return sorted(appointments, key=lambda x: datetime.strptime(x["call_time"], "%Y-%m-%d %H:%M"))
+def sort_appointments_and_convert_time(appointments):
+    for data_dict in appointments:
+        data_dict["call_time"] = datetime.strptime(data_dict["call_time"], "%Y-%m-%d %H:%M")
+        data_dict["appointment_time"] = datetime.strptime(data_dict["appointment_time"], "%Y-%m-%d %H:%M")
+    return sorted(appointments, key=lambda x: x["call_time"])
 
 bay_list = [[] for _ in range(10)]
 
@@ -107,7 +109,7 @@ def is_outside_working_hours(appointment):
     end_working_hour = datetime.strptime('19:00:00', '%H:%M:%S').time()
 
     # Parse the appointment time as a datetime object
-    appointment_time = datetime.strptime(appointment['appointment_time'], '%Y-%m-%d %H:%M')
+    appointment_time = appointment['appointment_time']
 
     # Extract the time part from the datetime
     appointment_time = appointment_time.time()
@@ -121,11 +123,10 @@ def is_outside_working_hours(appointment):
 def is_conflict(appointment1, appointment2):
 
     # Parse appointment times as datetime objects
-    time_format = "%Y-%m-%d %H:%M"
-    start_time1 = datetime.strptime(appointment1['appointment_time'], time_format)
+    start_time1 = appointment1['appointment_time']
     end_time1 = start_time1 + servicing_times.get(appointment1['type'], timedelta())
     
-    start_time2 = datetime.strptime(appointment2['appointment_time'], time_format)
+    start_time2 = appointment2['appointment_time']
     end_time2 = start_time2 + servicing_times.get(appointment2['type'], timedelta())
 
     # Check for conflict
@@ -168,7 +169,7 @@ def get_final_appointments_csv():
     output_csv(appointments)
 
 def get_final_appointments_dict_list(dict_list):
-    appointments = sort_appointments_list(dict_list)
+    appointments = sort_appointments_and_convert_time(dict_list)
 
     return get_final_appointments(appointments)
 

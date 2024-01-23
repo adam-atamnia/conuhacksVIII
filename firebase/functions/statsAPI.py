@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from firebase_admin import firestore
+from datetime import datetime
 
 db = firestore.client()
 batch = db.batch()
@@ -12,8 +13,8 @@ statsAPI = Blueprint('statsAPI', __name__)
 def get_data_between_dates():
     try:
         # Get the start and end dates for the reservation day from the query parameters
-        start_date = request.args.get('start_date')
-        end_date = request.args.get('end_date')
+        start_date_str = request.args.get('start_date')
+        end_date_str = request.args.get('end_date')
         # isAccepted = request.args.get('isAccepted')
         # type = request.args.get('type')
 
@@ -21,9 +22,15 @@ def get_data_between_dates():
         # Example: start_date = "2022-11-27", end_date = "2022-11-27"
         # You can use datetime.strptime to parse the date strings if needed.
 
+        start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+        end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+
+        # Adjust end_date to include the full day
+        end_date = end_date.replace(hour=23, minute=59, second=59)
+
         # Query Firestore to retrieve records within the specified time range
         appointments_ref = db.collection(appointments_collection_name)
-        query = appointments_ref.where('Reservation_Date', '>=', start_date).where('Reservation_Date', '<=', end_date)
+        query = appointments_ref.where('appointment_time', '>=', start_date).where('appointment_time', '<=', end_date)
         results = query.stream()
 
         # Create a list to store the retrieved records
@@ -32,6 +39,13 @@ def get_data_between_dates():
         for doc in results:
             # Convert Firestore document data to a Python dictionary
             data = doc.to_dict()
+
+            # Convert Timestamp fields to formatted strings
+            if 'call_time' in data and data['call_time']:
+                data['call_time'] = data['call_time'].strftime('%Y-%m-%d %H:%M')
+            if 'appointment_time' in data and data['appointment_time']:
+                data['appointment_time'] = data['appointment_time'].strftime('%Y-%m-%d %H:%M')
+
 
             # Add the document data to the list of records
             records.append(data)
