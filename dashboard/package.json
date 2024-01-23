@@ -2,6 +2,7 @@
   "name": "mosaic-react",
   "version": "0.1.0",
   "type": "module",
+  "proxy": "https://httpsflask-p653ixf4wq-uc.a.run.app",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
