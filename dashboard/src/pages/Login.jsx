@@ -14,7 +14,7 @@ const LoginPage = () => {
           onClick={() => loginWithRedirect({ redirect_uri: "http://localhost:5173/upload" })}
           className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded"
         >
-          {isAuthenticated ? <div>Login</div>: <div>Logout</div>}
+          {!isAuthenticated ? <div>Login</div>: <div>Logout</div>}
         </button>
         
       </div>
