@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@radix-ui/react-toast": "^1.1.5",
+    "react-loader-spinner": "^6.1.6"
+  }
+}
